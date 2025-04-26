@@ -2,10 +2,8 @@ package com.transportadora.logistica.adapter.in;
 
 import com.transportadora.logistica.dto.EntregaRequestDTO;
 import com.transportadora.logistica.dto.EntregaResponseDTO;
-import com.transportadora.logistica.service.EntregaService;
 
 import com.transportadora.logistica.usecase.port.in.EntregaServicePort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

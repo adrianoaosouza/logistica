@@ -6,6 +6,7 @@ import com.transportadora.logistica.dto.EntregaResponseDTO;
 import java.util.List;
 import java.util.UUID;
 
+
 public interface EntregaServicePort {
     EntregaResponseDTO criarEntrega(EntregaRequestDTO dto);
     EntregaResponseDTO buscarPorCodigo(UUID codigo);
