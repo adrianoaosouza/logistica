@@ -1,0 +1,66 @@
+# 📦 Projeto Entrega - Logística de Entregas com Arquitetura Hexagonal
+
+Este projeto é um mini-sistema de logística de entregas, implementado com Java e Spring Boot, e estruturado em duas fases principais: desenvolvimento orientado a testes e refatoração para arquitetura hexagonal (Ports and Adapters).
+
+## ✅ Funcionalidades
+
+- Criar entrega
+- Buscar entrega por código de rastreio
+- Listar entregas
+- Cancelar entrega
+
+---
+
+## 🧪 Semana 1 - Testes e Implementação Inicial
+
+A primeira versão do projeto foca em boas práticas de TDD (Test-Driven Development) com testes unitários utilizando:
+
+- JUnit 5
+- Mockito
+- Spring Boot Test
+
+Veja os testes na pasta `/test`, cobrindo:
+- Criação de entregas
+- Busca por código
+- Listagem geral
+- Cancelamento
+
+---
+
+## 🛠️ Semana 2 - Arquitetura Hexagonal
+
+A segunda fase refatora o projeto para aplicar a **arquitetura hexagonal**, promovendo o desacoplamento entre a lógica de negócio, os frameworks e a infraestrutura.
+
+### 🔹 Portas (Ports)
+
+- **Entrada (Input)**: Interface `EntregaServicePort` define os casos de uso disponíveis.
+- **Saída (Output)**: Interface `EntregaRepositoryPort` define as operações de persistência.
+
+### 🔸 Adaptadores (Adapters)
+
+- **Entrada (Input)**: `EntregaController` (REST API via Spring Web)
+- **Saída (Output)**: `EntregaRepositoryAdapter` (implementação com Spring Data JPA)
+
+---
+
+## 🗂️ Estrutura de Pastas
+
+```bash
+src/
+└── main/
+    ├── java/com.transportadora.logistica/
+    │   ├── adapter/
+    │   │   ├── in/web               # Controllers REST
+    │   │   └── out/persistence      # Adaptadores para banco de dados
+    │   ├── application/
+    │   │   ├── service/
+    │   │   │   └── port             # Interfaces de serviço
+    │   │   └── service              # Lógica de negócio
+    │   ├── domain/                  # Entidades e classes de domínio
+    │   │   ├── entity/              # Entidades do domínio
+    │   │   ├── dto/                 # Objetos de transferência de dados (DTOs)
+    │   │   └── mapper/              # Conversões entre DTO e entidade
+    │   ├── config/                  # Beans e configurações manuais
+    │   └── repository/              # Repositórios do Spring Data
+    └── resources/
+        └── application.properties
