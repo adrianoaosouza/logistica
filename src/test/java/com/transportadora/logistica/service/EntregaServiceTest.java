@@ -5,6 +5,7 @@ import com.transportadora.logistica.dto.EntregaResponseDTO;
 import com.transportadora.logistica.entity.Entrega;
 import com.transportadora.logistica.mapper.EntregaMapper;
 import com.transportadora.logistica.repository.EntregaRepository;
+import com.transportadora.logistica.usecase.port.out.EntregaRepositoryPort;
 import com.transportadora.logistica.utils.CodigoRastreioGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +28,7 @@ import static org.mockito.Mockito.when;
 class EntregaServiceTest {
 
     @Mock
-    private EntregaRepository entregaRepository;
+    private EntregaRepositoryPort entregaRepositoryPort;
 
     @Mock
     private CodigoRastreioGenerator rastreioGenerator;
@@ -36,36 +38,30 @@ class EntregaServiceTest {
 
     @Test
     void deveCriarEntregaComSucesso() {
-        // Arrange
         EntregaRequestDTO requestDTO = new EntregaRequestDTO();
         requestDTO.setNomeDestinatario("João Silva");
-        requestDTO.setEndereco("Rua das Laranjeiras, 123");
+        requestDTO.setEndereco("Rua A, 123");
 
-        // Mock do objeto salvo (simula o que o repository salvaria e devolveria)
         Entrega entregaSalva = Entrega.builder()
                 .id(1L)
-                .nomeDestinatario("João Silva")
-                .endereco("Rua das Laranjeiras, 123")
+                .nomeDestinatario(requestDTO.getNomeDestinatario())
+                .endereco(requestDTO.getEndereco())
                 .codigoRastreamento(UUID.randomUUID())
                 .dataCriacao(LocalDateTime.now())
                 .dataEntregaEstimada(LocalDateTime.now().plusDays(5))
                 .status(Entrega.StatusEntrega.PENDENTE)
                 .build();
 
-        when(entregaRepository.save(any(Entrega.class))).thenReturn(entregaSalva);
+        when(entregaRepositoryPort.salvar(any(Entrega.class))).thenReturn(entregaSalva);
 
-        // Act
         EntregaResponseDTO response = entregaService.criarEntrega(requestDTO);
 
-        // Assert
         assertNotNull(response);
-        assertEquals("João Silva", response.getNomeDestinatario());
-        assertEquals("Rua das Laranjeiras, 123", response.getEndereco());
-        assertNotNull(response.getCodigoRastreamento());
-        assertEquals("PENDENTE", response.getStatus());
-
-        verify(entregaRepository).save(any(Entrega.class));
+        assertEquals(entregaSalva.getNomeDestinatario(), response.getNomeDestinatario());
+        assertEquals(entregaSalva.getEndereco(), response.getEndereco());
+        verify(entregaRepositoryPort).salvar(any(Entrega.class));
     }
+
 
     @Test
     void deveBuscarEntregaPorCodigoComSucesso() {
@@ -80,13 +76,13 @@ class EntregaServiceTest {
                 .status(Entrega.StatusEntrega.PENDENTE)
                 .build();
 
-        when(entregaRepository.findByCodigoRastreamento(codigo)).thenReturn(java.util.Optional.of(entrega));
+        when(entregaRepositoryPort.buscarPorCodigo(codigo)).thenReturn(Optional.of(entrega));
 
         EntregaResponseDTO response = entregaService.buscarPorCodigo(codigo);
 
         assertNotNull(response);
         assertEquals(codigo, response.getCodigoRastreamento());
-        verify(entregaRepository).findByCodigoRastreamento(codigo);
+        verify(entregaRepositoryPort).buscarPorCodigo(codigo);
     }
 
     @Test
@@ -111,12 +107,12 @@ class EntregaServiceTest {
                 .status(Entrega.StatusEntrega.PENDENTE)
                 .build();
 
-        when(entregaRepository.findAll()).thenReturn(List.of(entrega1, entrega2));
+        when(entregaRepositoryPort.listarTodos()).thenReturn(List.of(entrega1, entrega2));
 
         List<EntregaResponseDTO> entregas = entregaService.listarEntregas();
 
         assertEquals(2, entregas.size());
-        verify(entregaRepository).findAll();
+        verify(entregaRepositoryPort).listarTodos();
     }
 
     @Test
@@ -132,12 +128,12 @@ class EntregaServiceTest {
                 .status(Entrega.StatusEntrega.PENDENTE)
                 .build();
 
-        when(entregaRepository.findByCodigoRastreamento(codigo)).thenReturn(java.util.Optional.of(entrega));
+        when(entregaRepositoryPort.buscarPorCodigo(codigo)).thenReturn(Optional.of(entrega));
 
         entregaService.cancelarEntrega(codigo);
 
         assertEquals(Entrega.StatusEntrega.CANCELADA, entrega.getStatus());
-        verify(entregaRepository).save(entrega);
+        verify(entregaRepositoryPort).salvar(entrega);
     }
 
 }

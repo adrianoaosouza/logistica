@@ -1,5 +1,6 @@
 package com.transportadora.logistica.dto;
 
+import com.transportadora.logistica.entity.Entrega;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,4 +17,15 @@ public class EntregaResponseDTO {
     private LocalDateTime dataEntregaEstimada;
     private String status;
 
+
+    public static EntregaResponseDTO fromEntity(Entrega entrega) {
+        return EntregaResponseDTO.builder()
+                .codigoRastreamento(entrega.getCodigoRastreamento())
+                .nomeDestinatario(entrega.getNomeDestinatario())
+                .endereco(entrega.getEndereco())
+                .dataCriacao(entrega.getDataCriacao())
+                .dataEntregaEstimada(entrega.getDataEntregaEstimada())
+                .status(entrega.getStatus().name())
+                .build();
+    }
 }
